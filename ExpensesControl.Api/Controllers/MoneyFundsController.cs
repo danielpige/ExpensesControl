@@ -1,4 +1,5 @@
 ﻿using ExpensesControl.Api.Common;
+using ExpensesControl.Application.Common.Models.Pagination;
 using ExpensesControl.Application.Dtos.MoneyFund;
 using ExpensesControl.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -19,10 +20,10 @@ namespace ExpensesControl.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
         {
-            var data = await _moneyFundService.GetAllAsync();
-            return Ok(ApiResponse<List<MoneyFundDto>>.Ok(data));
+            var data = await _moneyFundService.GetAllAsync(pageNumber, pageSize);
+            return Ok(ApiResponse<PagedResult<MoneyFundDto>>.Ok(data));
         }
 
         [HttpGet("{id:int}")]

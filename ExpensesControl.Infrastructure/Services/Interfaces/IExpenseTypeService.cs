@@ -1,4 +1,5 @@
-﻿using ExpensesControl.Application.Dtos.ExpenseType;
+﻿using ExpensesControl.Application.Common.Models.Pagination;
+using ExpensesControl.Application.Dtos.ExpenseType;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace ExpensesControl.Infrastructure.Services.Interfaces
 {
     public interface IExpenseTypeService
     {
-        Task<List<ExpenseTypeDto>> GetAllAsync();
+        Task<PagedResult<ExpenseTypeDto>> GetAllAsync(int? pageNumber = null, int? pageSize = null);
         Task<ExpenseTypeDto?> GetByIdAsync(int id);
         Task<ExpenseTypeDto> CreateAsync(CreateExpenseTypeRequestDto dto);
         Task<ExpenseTypeDto?> UpdateAsync(int id, UpdateExpenseTypeRequestDto dto);

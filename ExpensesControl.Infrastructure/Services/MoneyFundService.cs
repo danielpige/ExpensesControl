@@ -1,6 +1,8 @@
-﻿using ExpensesControl.Application.Dtos.MoneyFund;
+﻿using ExpensesControl.Application.Common.Models.Pagination;
+using ExpensesControl.Application.Dtos.MoneyFund;
 using ExpensesControl.Domain.Entities;
 using ExpensesControl.Infrastructure.Persistence;
+using ExpensesControl.Infrastructure.Persistence.Extensions;
 using ExpensesControl.Infrastructure.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -20,19 +22,26 @@ namespace ExpensesControl.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<List<MoneyFundDto>> GetAllAsync()
+        public async Task<PagedResult<MoneyFundDto>> GetAllAsync(int? pageNumber = 0, int? pageSize = 0)
         {
-            return await _context.MoneyFunds
-                .OrderBy(x => x.Name)
-                .Select(x => new MoneyFundDto
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    AccountType = x.AccountType,
-                    CurrentBalance = x.CurrentBalance,
-                    IsActive = x.IsActive
-                })
-                .ToListAsync();
+
+            var query = _context.MoneyFunds
+                .AsNoTracking()
+                .OrderBy(x => x.CreatedAt);
+
+            var result = await query.ToPagedResultAsync(
+            pageNumber,
+            pageSize,
+            x => new MoneyFundDto
+            {
+                Id = x.Id,
+                Name = x.Name,
+                AccountType = x.AccountType,
+                CurrentBalance = x.CurrentBalance,
+                IsActive = x.IsActive
+            });
+
+            return result;
         }
 
         public async Task<MoneyFundDto?> GetByIdAsync(int id)
@@ -113,7 +122,7 @@ namespace ExpensesControl.Infrastructure.Services
         {
             return await _context.MoneyFunds
                 .Where(mf => mf.IsActive)
-                .OrderBy(mf => mf.Name)
+                .OrderBy(mf => mf.CreatedAt)
                 .Select(mf => new MoneyFundDto
                 {
                     Id = mf.Id,

@@ -1,6 +1,8 @@
-﻿using ExpensesControl.Application.Dtos.ExpenseType;
+﻿using ExpensesControl.Application.Common.Models.Pagination;
+using ExpensesControl.Application.Dtos.ExpenseType;
 using ExpensesControl.Domain.Entities;
 using ExpensesControl.Infrastructure.Persistence;
+using ExpensesControl.Infrastructure.Persistence.Extensions;
 using ExpensesControl.Infrastructure.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -8,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ExpensesControl.Infrastructure.Services
 {
@@ -20,18 +23,24 @@ namespace ExpensesControl.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<List<ExpenseTypeDto>> GetAllAsync()
+        public async Task<PagedResult<ExpenseTypeDto>> GetAllAsync(int? pageNumber = 0, int? pageSize = 0)
         {
-            return await _context.ExpenseTypes
-                .OrderBy(x => x.Name)
-                .Select(x => new ExpenseTypeDto
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Code = x.Code,
-                    IsActive = x.IsActive
-                })
-                .ToListAsync();
+            var query = _context.ExpenseTypes
+                .AsNoTracking()
+                .OrderBy(x => x.CreatedAt);
+
+            var result = await query.ToPagedResultAsync(
+            pageNumber,
+            pageSize,
+            x => new ExpenseTypeDto
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Code = x.Code,
+                IsActive = x.IsActive
+            });
+
+            return result;
         }
 
         public async Task<ExpenseTypeDto?> GetByIdAsync(int id)
@@ -141,7 +150,7 @@ namespace ExpensesControl.Infrastructure.Services
         {
             return await _context.ExpenseTypes
                 .Where(et => et.IsActive)
-                .OrderBy(et => et.Name)
+                .OrderBy(et => et.CreatedAt)
                 .Select(et => new ExpenseTypeDto
                 {
                     Id = et.Id,

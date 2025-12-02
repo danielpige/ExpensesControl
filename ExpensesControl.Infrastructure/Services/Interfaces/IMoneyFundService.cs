@@ -1,4 +1,5 @@
-﻿using ExpensesControl.Application.Dtos.MoneyFund;
+﻿using ExpensesControl.Application.Common.Models.Pagination;
+using ExpensesControl.Application.Dtos.MoneyFund;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace ExpensesControl.Infrastructure.Services.Interfaces
 {
     public interface IMoneyFundService
     {
-        Task<List<MoneyFundDto>> GetAllAsync();
+        Task<PagedResult<MoneyFundDto>> GetAllAsync(int? pageNumber = 0, int? pageSize = 0);
         Task<MoneyFundDto?> GetByIdAsync(int id);
         Task<MoneyFundDto> CreateAsync(CreateMoneyFundRequestDto dto);
         Task<MoneyFundDto?> UpdateAsync(int id, UpdateMoneyFundRequestDto dto);
