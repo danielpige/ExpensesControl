@@ -30,6 +30,14 @@ namespace ExpensesControl.Infrastructure.Persistence.Configurations
             builder.Property(x => x.IsActive)
                 .IsRequired();
 
+            builder.Property(x => x.UserId)
+                .IsRequired();
+
+            builder.HasOne(x => x.User)
+                .WithMany(u => u.MoneyFunds)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.HasMany(x => x.Expenses)
                 .WithOne(x => x.MoneyFund)
                 .HasForeignKey(x => x.MoneyFundId)

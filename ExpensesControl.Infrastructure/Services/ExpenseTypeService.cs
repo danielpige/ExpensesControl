@@ -37,7 +37,30 @@ namespace ExpensesControl.Infrastructure.Services
                 Id = x.Id,
                 Name = x.Name,
                 Code = x.Code,
-                IsActive = x.IsActive
+                IsActive = x.IsActive,
+                UserId = x.UserId
+            });
+
+            return result;
+        }
+
+        public async Task<PagedResult<ExpenseTypeDto>> GetAllByUserIdAsync(int userId, int? pageNumber = 0, int? pageSize = 0)
+        {
+            var query = _context.ExpenseTypes
+                .AsNoTracking()
+                .Where(x => x.UserId == userId)
+                .OrderBy(x => x.CreatedAt);
+
+            var result = await query.ToPagedResultAsync(
+            pageNumber,
+            pageSize,
+            x => new ExpenseTypeDto
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Code = x.Code,
+                IsActive = x.IsActive,
+                UserId = x.UserId
             });
 
             return result;
@@ -57,11 +80,10 @@ namespace ExpensesControl.Infrastructure.Services
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<ExpenseTypeDto> CreateAsync(CreateExpenseTypeRequestDto dto)
+        public async Task<ExpenseTypeDto> CreateAsync(CreateExpenseTypeRequestDto dto, int userId)
         {
-            // Validar duplicado por nombre (opcional pero recomendable)
             var exists = await _context.ExpenseTypes
-                .AnyAsync(t => t.Name == dto.Name);
+                .AnyAsync(t => t.Name.ToLower() == dto.Name.ToLower() && t.UserId == userId);
 
             if (exists)
                 throw new InvalidOperationException("An expense type with the same name already exists.");
@@ -73,7 +95,8 @@ namespace ExpensesControl.Infrastructure.Services
             {
                 Name = dto.Name,
                 Code = nextCode,
-                IsActive = true
+                IsActive = true,
+                UserId = userId
             };
 
             await _context.ExpenseTypes.AddAsync(entity);
@@ -84,7 +107,8 @@ namespace ExpensesControl.Infrastructure.Services
                 Id = entity.Id,
                 Name = entity.Name,
                 Code = entity.Code,
-                IsActive = entity.IsActive
+                IsActive = entity.IsActive,
+                UserId = entity.UserId
             };
         }
 
@@ -105,7 +129,8 @@ namespace ExpensesControl.Infrastructure.Services
                 Id = entity.Id,
                 Name = entity.Name,
                 Code = entity.Code,
-                IsActive = entity.IsActive
+                IsActive = entity.IsActive,
+                UserId = entity.UserId
             };
         }
 
@@ -146,7 +171,7 @@ namespace ExpensesControl.Infrastructure.Services
             return $"{prefix}{nextNumber:D3}";
         }
 
-        public async Task<List<ExpenseTypeDto>> GetActiveAsync()
+        public async Task<List<ExpenseTypeDto>> GetActivesAsync()
         {
             return await _context.ExpenseTypes
                 .Where(et => et.IsActive)
@@ -156,7 +181,24 @@ namespace ExpensesControl.Infrastructure.Services
                     Id = et.Id,
                     Code = et.Code,
                     Name = et.Name,
-                    IsActive = et.IsActive
+                    IsActive = et.IsActive,
+                    UserId = et.UserId
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<ExpenseTypeDto>> GetActivesByUserIdAsync(int userId)
+        {
+            return await _context.ExpenseTypes
+                .Where(et => et.IsActive && et.UserId == userId)
+                .OrderBy(et => et.CreatedAt)
+                .Select(et => new ExpenseTypeDto
+                {
+                    Id = et.Id,
+                    Code = et.Code,
+                    Name = et.Name,
+                    IsActive = et.IsActive,
+                    UserId = et.UserId
                 })
                 .ToListAsync();
         }

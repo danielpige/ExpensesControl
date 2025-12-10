@@ -11,10 +11,12 @@ namespace ExpensesControl.Infrastructure.Services.Interfaces
     public interface IExpenseTypeService
     {
         Task<PagedResult<ExpenseTypeDto>> GetAllAsync(int? pageNumber = null, int? pageSize = null);
+        Task<PagedResult<ExpenseTypeDto>> GetAllByUserIdAsync(int userId, int? pageNumber = null, int? pageSize = null);
         Task<ExpenseTypeDto?> GetByIdAsync(int id);
-        Task<ExpenseTypeDto> CreateAsync(CreateExpenseTypeRequestDto dto);
+        Task<ExpenseTypeDto> CreateAsync(CreateExpenseTypeRequestDto dto, int userId);
         Task<ExpenseTypeDto?> UpdateAsync(int id, UpdateExpenseTypeRequestDto dto);
         Task<bool> DeleteAsync(int id); // soft delete (IsActive = false)
-        Task<List<ExpenseTypeDto>> GetActiveAsync();
+        Task<List<ExpenseTypeDto>> GetActivesAsync();
+        Task<List<ExpenseTypeDto>> GetActivesByUserIdAsync(int userId);
     }
 }

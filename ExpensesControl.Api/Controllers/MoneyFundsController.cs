@@ -4,6 +4,7 @@ using ExpensesControl.Application.Dtos.MoneyFund;
 using ExpensesControl.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ExpensesControl.Api.Controllers
 {
@@ -19,10 +20,20 @@ namespace ExpensesControl.Api.Controllers
             _moneyFundService = moneyFundService;
         }
 
+        private int GetUserId() =>
+            int.Parse(User.FindFirstValue("userId")!);
+
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
         {
             var data = await _moneyFundService.GetAllAsync(pageNumber, pageSize);
+            return Ok(ApiResponse<PagedResult<MoneyFundDto>>.Ok(data));
+        }
+
+        [HttpGet("get-all-by-current-user")]
+        public async Task<IActionResult> GetAllByCurrentUser([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
+        {
+            var data = await _moneyFundService.GetAllByUserIdAsync(GetUserId(), pageNumber, pageSize);
             return Ok(ApiResponse<PagedResult<MoneyFundDto>>.Ok(data));
         }
 
@@ -39,7 +50,7 @@ namespace ExpensesControl.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateMoneyFundRequestDto dto)
         {
-            var created = await _moneyFundService.CreateAsync(dto);
+            var created = await _moneyFundService.CreateAsync(dto, GetUserId());
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, ApiResponse<MoneyFundDto>.Ok(created));
         }
 
@@ -63,10 +74,17 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<string>.Ok("Money fund disabled successfully."));
         }
 
-        [HttpGet("active")]
-        public async Task<ActionResult<ApiResponse<List<MoneyFundDto>>>> GetActive()
+        [HttpGet("actives")]
+        public async Task<ActionResult<ApiResponse<List<MoneyFundDto>>>> GetActives()
         {
-            var items = await _moneyFundService.GetActiveAsync();
+            var items = await _moneyFundService.GetActivesAsync();
+            return Ok(ApiResponse<List<MoneyFundDto>>.Ok(items));
+        }
+
+        [HttpGet("get-all-by-current-user/actives")]
+        public async Task<ActionResult<ApiResponse<List<MoneyFundDto>>>> GetActivesByCurrentUser()
+        {
+            var items = await _moneyFundService.GetActivesByUserIdAsync(GetUserId());
             return Ok(ApiResponse<List<MoneyFundDto>>.Ok(items));
         }
     }

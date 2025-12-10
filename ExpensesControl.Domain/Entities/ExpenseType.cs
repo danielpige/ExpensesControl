@@ -13,8 +13,10 @@ namespace ExpensesControl.Domain.Entities
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public bool IsActive { get; set; } = true;
+        public int UserId { get; set; }
 
         public ICollection<Budget> Budgets { get; set; } = new List<Budget>();
         public ICollection<ExpenseDetail> ExpenseDetails { get; set; } = new List<ExpenseDetail>();
+        public User User { get; set; } = default!;
     }
 }

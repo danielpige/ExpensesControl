@@ -11,10 +11,12 @@ namespace ExpensesControl.Infrastructure.Services.Interfaces
     public interface IMoneyFundService
     {
         Task<PagedResult<MoneyFundDto>> GetAllAsync(int? pageNumber = 0, int? pageSize = 0);
+        Task<PagedResult<MoneyFundDto>> GetAllByUserIdAsync(int userId, int? pageNumber = 0, int? pageSize = 0);
         Task<MoneyFundDto?> GetByIdAsync(int id);
-        Task<MoneyFundDto> CreateAsync(CreateMoneyFundRequestDto dto);
+        Task<MoneyFundDto> CreateAsync(CreateMoneyFundRequestDto dto, int userId);
         Task<MoneyFundDto?> UpdateAsync(int id, UpdateMoneyFundRequestDto dto);
         Task<bool> DeleteAsync(int id); // Soft delete
-        Task<List<MoneyFundDto>> GetActiveAsync();
+        Task<List<MoneyFundDto>> GetActivesAsync();
+        Task<List<MoneyFundDto>> GetActivesByUserIdAsync(int userId);
     }
 }

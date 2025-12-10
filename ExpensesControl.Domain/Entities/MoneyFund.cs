@@ -13,8 +13,10 @@ namespace ExpensesControl.Domain.Entities
         public string? AccountType { get; set; }
         public decimal CurrentBalance { get; set; }
         public bool IsActive { get; set; } = true;
+        public int UserId { get; set; }
 
         public ICollection<ExpenseHeader> Expenses { get; set; } = new List<ExpenseHeader>();
         public ICollection<Deposit> Deposits { get; set; } = new List<Deposit>();
+        public User User { get; set; } = default!;
     }
 }

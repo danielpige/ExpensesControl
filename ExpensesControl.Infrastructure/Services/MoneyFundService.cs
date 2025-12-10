@@ -38,7 +38,32 @@ namespace ExpensesControl.Infrastructure.Services
                 Name = x.Name,
                 AccountType = x.AccountType,
                 CurrentBalance = x.CurrentBalance,
-                IsActive = x.IsActive
+                IsActive = x.IsActive,
+                UserId = x.UserId,
+            });
+
+            return result;
+        }
+
+        public async Task<PagedResult<MoneyFundDto>> GetAllByUserIdAsync(int userId, int? pageNumber = 0, int? pageSize = 0)
+        {
+
+            var query = _context.MoneyFunds
+                .AsNoTracking()
+                .Where(x => x.UserId == userId)
+                .OrderBy(x => x.CreatedAt);
+
+            var result = await query.ToPagedResultAsync(
+            pageNumber,
+            pageSize,
+            x => new MoneyFundDto
+            {
+                Id = x.Id,
+                Name = x.Name,
+                AccountType = x.AccountType,
+                CurrentBalance = x.CurrentBalance,
+                IsActive = x.IsActive,
+                UserId = x.UserId
             });
 
             return result;
@@ -59,14 +84,21 @@ namespace ExpensesControl.Infrastructure.Services
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<MoneyFundDto> CreateAsync(CreateMoneyFundRequestDto dto)
+        public async Task<MoneyFundDto> CreateAsync(CreateMoneyFundRequestDto dto, int userId)
         {
+            var exists = await _context.MoneyFunds
+                .AnyAsync(t => t.Name.ToLower() == dto.Name.ToLower() && t.UserId == userId);
+
+            if (exists)
+                throw new InvalidOperationException("An money fund with the same name already exists.");
+
             var fund = new MoneyFund
             {
                 Name = dto.Name,
                 AccountType = dto.AccountType,
                 CurrentBalance = dto.InitialBalance,
-                IsActive = true
+                IsActive = true,
+                UserId = userId
             };
 
             await _context.MoneyFunds.AddAsync(fund);
@@ -78,7 +110,8 @@ namespace ExpensesControl.Infrastructure.Services
                 Name = fund.Name,
                 AccountType = fund.AccountType,
                 CurrentBalance = fund.CurrentBalance,
-                IsActive = fund.IsActive
+                IsActive = fund.IsActive,
+                UserId = fund.UserId
             };
         }
 
@@ -101,7 +134,8 @@ namespace ExpensesControl.Infrastructure.Services
                 Name = fund.Name,
                 AccountType = fund.AccountType,
                 CurrentBalance = fund.CurrentBalance,
-                IsActive = fund.IsActive
+                IsActive = fund.IsActive,
+                UserId = fund.UserId
             };
         }
 
@@ -118,7 +152,7 @@ namespace ExpensesControl.Infrastructure.Services
             return true;
         }
 
-        public async Task<List<MoneyFundDto>> GetActiveAsync()
+        public async Task<List<MoneyFundDto>> GetActivesAsync()
         {
             return await _context.MoneyFunds
                 .Where(mf => mf.IsActive)
@@ -129,7 +163,25 @@ namespace ExpensesControl.Infrastructure.Services
                     Name = mf.Name,
                     AccountType = mf.AccountType,
                     CurrentBalance = mf.CurrentBalance,
-                    IsActive = mf.IsActive
+                    IsActive = mf.IsActive,
+                    UserId = mf.UserId
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<MoneyFundDto>> GetActivesByUserIdAsync(int userId)
+        {
+            return await _context.MoneyFunds
+                .Where(mf => mf.IsActive && mf.UserId == userId)
+                .OrderBy(mf => mf.CreatedAt)
+                .Select(mf => new MoneyFundDto
+                {
+                    Id = mf.Id,
+                    Name = mf.Name,
+                    AccountType = mf.AccountType,
+                    CurrentBalance = mf.CurrentBalance,
+                    IsActive = mf.IsActive,
+                    UserId = mf.UserId
                 })
                 .ToListAsync();
         }

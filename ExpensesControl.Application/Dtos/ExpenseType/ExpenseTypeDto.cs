@@ -12,5 +12,6 @@ namespace ExpensesControl.Application.Dtos.ExpenseType
         public string Name { get; set; } = null!;
         public string Code { get; set; } = null!;
         public bool IsActive { get; set; }
+        public int UserId { get; set; }
     }
 }

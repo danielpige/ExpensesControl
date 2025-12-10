@@ -16,5 +16,7 @@ namespace ExpensesControl.Domain.Entities
         public ICollection<Budget> Budgets { get; set; } = new List<Budget>();
         public ICollection<ExpenseHeader> ExpenseHeaders { get; set; } = new List<ExpenseHeader>();
         public ICollection<Deposit> Deposits { get; set; } = new List<Deposit>();
+        public ICollection<ExpenseType> ExpenseTypes { get; set; } = new List<ExpenseType>();
+        public ICollection<MoneyFund> MoneyFunds { get; set; } = new List<MoneyFund>();
     }
 }

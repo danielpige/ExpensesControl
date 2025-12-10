@@ -13,5 +13,6 @@ namespace ExpensesControl.Application.Dtos.MoneyFund
         public string? AccountType { get; set; }
         public decimal CurrentBalance { get; set; }
         public bool IsActive { get; set; }
+        public int UserId { get; set; }
     }
 }

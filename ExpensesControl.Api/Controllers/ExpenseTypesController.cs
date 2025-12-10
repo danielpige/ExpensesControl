@@ -4,6 +4,7 @@ using ExpensesControl.Application.Dtos.ExpenseType;
 using ExpensesControl.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ExpensesControl.Api.Controllers
 {
@@ -19,10 +20,20 @@ namespace ExpensesControl.Api.Controllers
             _expenseTypeService = expenseTypeService;
         }
 
+        private int GetUserId() =>
+            int.Parse(User.FindFirstValue("userId")!);
+
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
         {
             var data = await _expenseTypeService.GetAllAsync(pageNumber, pageSize);
+            return Ok(ApiResponse<PagedResult<ExpenseTypeDto>>.Ok(data));
+        }
+
+        [HttpGet("get-all-by-current-user")]
+        public async Task<IActionResult> GetAllByCurrentUser([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
+        {
+            var data = await _expenseTypeService.GetAllByUserIdAsync(GetUserId(), pageNumber, pageSize);
             return Ok(ApiResponse<PagedResult<ExpenseTypeDto>>.Ok(data));
         }
 
@@ -41,7 +52,7 @@ namespace ExpensesControl.Api.Controllers
         {
             try
             {
-                var created = await _expenseTypeService.CreateAsync(dto);
+                var created = await _expenseTypeService.CreateAsync(dto, GetUserId());
                 return CreatedAtAction(nameof(GetById), new { id = created.Id },
                     ApiResponse<ExpenseTypeDto>.Ok(created, "Expense type created successfully."));
             }
@@ -71,11 +82,19 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<string>.Ok("Expense type disabled successfully."));
         }
 
-        [HttpGet("active")]
-        public async Task<ActionResult<ApiResponse<List<ExpenseTypeDto>>>> GetActive()
+        [HttpGet("actives")]
+        public async Task<ActionResult<ApiResponse<List<ExpenseTypeDto>>>> GetActiveS()
         {
-            var items = await _expenseTypeService.GetActiveAsync();
+            var items = await _expenseTypeService.GetActivesAsync();
             return Ok(ApiResponse<List<ExpenseTypeDto>>.Ok(items));
         }
+
+        [HttpGet("get-all-by-current-user/actives")]
+        public async Task<ActionResult<ApiResponse<List<ExpenseTypeDto>>>> GetAllActivesByCurrentUser()
+        {
+            var items = await _expenseTypeService.GetActivesByUserIdAsync(GetUserId());
+            return Ok(ApiResponse<List<ExpenseTypeDto>>.Ok(items));
+        }
+
     }
 }
