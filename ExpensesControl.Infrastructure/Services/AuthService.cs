@@ -1,7 +1,7 @@
 ﻿using ExpensesControl.Application.Dtos.Auth;
 using ExpensesControl.Domain.Entities;
 using ExpensesControl.Infrastructure.Persistence;
-using ExpensesControl.Infrastructure.Services.Interfaces;
+using ExpensesControl.Application.Common.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;

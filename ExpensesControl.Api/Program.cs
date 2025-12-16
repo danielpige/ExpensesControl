@@ -1,10 +1,11 @@
-﻿using ExpensesControl.Api.Middlewares;
+﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using ExpensesControl.Api.Middlewares;
 using ExpensesControl.Application.Common.Interfaces;
+using ExpensesControl.Application.Common.Interfaces.Services;
 using ExpensesControl.Application.Common.Security;
 using ExpensesControl.Infrastructure.Persistence;
 using ExpensesControl.Infrastructure.Repositories;
 using ExpensesControl.Infrastructure.Services;
-using ExpensesControl.Infrastructure.Services.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -46,6 +47,7 @@ builder.Services.AddScoped<IDepositService, DepositService>();
 builder.Services.AddScoped<IMovementService, MovementService>();
 builder.Services.AddScoped<IExpenseTypeService, ExpenseTypeService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IMovementReportService, MovementReportService>();
 
 // Controllers + FluentValidation
 builder.Services

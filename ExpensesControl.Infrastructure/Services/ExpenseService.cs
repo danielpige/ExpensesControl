@@ -2,7 +2,7 @@
 using ExpensesControl.Application.Dtos.ExpenseType;
 using ExpensesControl.Domain.Entities;
 using ExpensesControl.Infrastructure.Persistence;
-using ExpensesControl.Infrastructure.Services.Interfaces;
+using ExpensesControl.Application.Common.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

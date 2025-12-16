@@ -1,7 +1,7 @@
 ﻿using ExpensesControl.Api.Common;
 using ExpensesControl.Application.Dtos.Movements;
 using ExpensesControl.Domain.Entities;
-using ExpensesControl.Infrastructure.Services.Interfaces;
+using ExpensesControl.Application.Common.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -14,16 +14,17 @@ namespace ExpensesControl.Api.Controllers
     public class MovementsController : ControllerBase
     {
         private readonly IMovementService _movementService;
+        private readonly IMovementReportService _movementReportService;
 
-        public MovementsController(IMovementService movementService)
+        public MovementsController(IMovementService movementService, IMovementReportService movementReportService)
         {
             _movementService = movementService;
+            _movementReportService = movementReportService;
         }
 
         private int GetUserId() =>
             int.Parse(User.FindFirstValue("userId")!);
 
-        // GET: /api/movements?from=2025-01-01&to=2025-01-31&moneyFundId=1
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] MovementQueryRequestDto query)
         {
@@ -35,6 +36,16 @@ namespace ExpensesControl.Api.Controllers
                 query.MoneyFundId);
 
             return Ok(ApiResponse<List<MovementDto>>.Ok(data));
+        }
+
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportMovements([FromQuery] MovementQueryRequestDto query)
+        {
+            var bytes = await _movementReportService.ExportMovementsToExcelAsync(GetUserId(), query.From, query.To, query.MoneyFundId);
+
+            var fileName = $"movements_{query.From:yyyyMMdd}_{query.To:yyyyMMdd}.xlsx";
+
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
     }
 }

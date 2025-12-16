@@ -1,6 +1,6 @@
 ﻿using ExpensesControl.Api.Common;
 using ExpensesControl.Application.Dtos.Auth;
-using ExpensesControl.Infrastructure.Services.Interfaces;
+using ExpensesControl.Application.Common.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpensesControl.Api.Controllers

@@ -1,6 +1,6 @@
 ﻿using ExpensesControl.Application.Dtos.Movements;
 using ExpensesControl.Infrastructure.Persistence;
-using ExpensesControl.Infrastructure.Services.Interfaces;
+using ExpensesControl.Application.Common.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -43,7 +43,7 @@ namespace ExpensesControl.Infrastructure.Services
                     MoneyFundId = e.MoneyFundId,
                     MoneyFundName = e.MoneyFund.Name,
                     Amount = e.TotalAmount,           // egreso total de la factura
-                    Description = e.MerchantName      // o e.Comments si prefieres
+                    Description = e.MerchantName      // o e.Comments
                 })
                 .ToListAsync();
 

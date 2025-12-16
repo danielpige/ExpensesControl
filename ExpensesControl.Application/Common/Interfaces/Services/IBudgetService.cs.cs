@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ExpensesControl.Infrastructure.Services.Interfaces
+namespace ExpensesControl.Application.Common.Interfaces.Services
 {
     public interface IBudgetService
     {

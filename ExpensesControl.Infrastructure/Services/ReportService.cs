@@ -1,6 +1,6 @@
 ﻿using ExpensesControl.Application.Dtos.Report;
 using ExpensesControl.Infrastructure.Persistence;
-using ExpensesControl.Infrastructure.Services.Interfaces;
+using ExpensesControl.Application.Common.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
