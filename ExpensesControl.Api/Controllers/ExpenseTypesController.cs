@@ -1,7 +1,7 @@
 ﻿using ExpensesControl.Api.Common;
 using ExpensesControl.Application.Common.Models.Pagination;
 using ExpensesControl.Application.Dtos.ExpenseType;
-using ExpensesControl.Infrastructure.Services.Interfaces;
+using ExpensesControl.Application.Common.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
