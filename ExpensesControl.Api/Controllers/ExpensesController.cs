@@ -1,7 +1,8 @@
-﻿using ExpensesControl.Api.Common;
+﻿using ExpensesControl.Api.Attributes;
+using ExpensesControl.Api.Common;
+using ExpensesControl.Application.Common.Interfaces.Services;
 using ExpensesControl.Application.Dtos.Expense;
 using ExpensesControl.Domain.Entities;
-using ExpensesControl.Application.Common.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -23,6 +24,7 @@ namespace ExpensesControl.Api.Controllers
         private int GetUserId() =>
             int.Parse(User.FindFirstValue("userId")!);
 
+        [RequireIdempotency]
         [HttpPost]
         public async Task<ActionResult> CreateExpense([FromBody] CreateExpenseRequestDto dto)
         {
@@ -35,7 +37,7 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<CreateExpenseResponseDto>.Ok(result, message));
         }
 
-        // GET: /api/expenses/{id}
+
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -46,7 +48,7 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<ExpenseDto>.Ok(expense));
         }
 
-        // GET: /api/expenses?from=2025-01-01&to=2025-01-31&moneyFundId=1
+
         [HttpGet]
         public async Task<IActionResult> GetByRange(
             [FromQuery] DateTime from,

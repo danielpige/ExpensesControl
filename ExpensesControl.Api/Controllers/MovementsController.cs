@@ -28,7 +28,6 @@ namespace ExpensesControl.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] MovementQueryRequestDto query)
         {
-            // Si la validación falla (FluentValidation), no entra aquí.
             var data = await _movementService.GetMovementsAsync(
                 GetUserId(),
                 query.From,

@@ -23,16 +23,17 @@ namespace ExpensesControl.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<PagedResult<ExpenseTypeDto>> GetAllAsync(int? pageNumber = 0, int? pageSize = 0)
+        public async Task<PagedResult<ExpenseTypeDto>> GetAllAsync(int pageNumber = 1, int pageSize = 10)
         {
             var query = _context.ExpenseTypes
                 .AsNoTracking()
-                .OrderBy(x => x.CreatedAt);
+                .OrderByDescending(x => x.CreatedAt)
+                .ThenByDescending(x => x.Id);
 
             var result = await query.ToPagedResultAsync(
             pageNumber,
             pageSize,
-            x => new ExpenseTypeDto
+            selector: x => new ExpenseTypeDto
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -44,17 +45,18 @@ namespace ExpensesControl.Infrastructure.Services
             return result;
         }
 
-        public async Task<PagedResult<ExpenseTypeDto>> GetAllByUserIdAsync(int userId, int? pageNumber = 0, int? pageSize = 0)
+        public async Task<PagedResult<ExpenseTypeDto>> GetAllByUserIdAsync(int userId, int pageNumber = 1, int pageSize = 10)
         {
             var query = _context.ExpenseTypes
                 .AsNoTracking()
                 .Where(x => x.UserId == userId)
-                .OrderBy(x => x.CreatedAt);
+                .OrderByDescending(x => x.CreatedAt)
+                .ThenByDescending(x => x.Id);
 
             var result = await query.ToPagedResultAsync(
             pageNumber,
             pageSize,
-            x => new ExpenseTypeDto
+            selector: x => new ExpenseTypeDto
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -175,7 +177,7 @@ namespace ExpensesControl.Infrastructure.Services
         {
             return await _context.ExpenseTypes
                 .Where(et => et.IsActive)
-                .OrderBy(et => et.CreatedAt)
+                .OrderByDescending(et => et.CreatedAt)
                 .Select(et => new ExpenseTypeDto
                 {
                     Id = et.Id,
@@ -191,7 +193,7 @@ namespace ExpensesControl.Infrastructure.Services
         {
             return await _context.ExpenseTypes
                 .Where(et => et.IsActive && et.UserId == userId)
-                .OrderBy(et => et.CreatedAt)
+                .OrderByDescending(et => et.CreatedAt)
                 .Select(et => new ExpenseTypeDto
                 {
                     Id = et.Id,

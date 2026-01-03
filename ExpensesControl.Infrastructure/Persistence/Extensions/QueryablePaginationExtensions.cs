@@ -12,57 +12,47 @@ namespace ExpensesControl.Infrastructure.Persistence.Extensions
     public static class QueryablePaginationExtensions
     {
         public static async Task<PagedResult<TDest>> ToPagedResultAsync<TSource, TDest>(
-            this IQueryable<TSource> query,
-            int? pageNumber,
-            int? pageSize,
+            this IOrderedQueryable<TSource> query,                 // obliga a OrderBy antes
+            int pageNumber,
+            int pageSize,
             Expression<Func<TSource, TDest>> selector,
+            int maxPageSize = 200,
+            bool includeTotalCount = true,
             CancellationToken cancellationToken = default)
         {
-            // 1. Conteo total sin paginar
-            var totalCount = await query.CountAsync(cancellationToken);
+            pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+            pageSize = pageSize <= 0 ? 10 : pageSize;
+            pageSize = Math.Min(pageSize, maxPageSize);
 
-            // 2. Decidir si se aplica paginación
-            var usePagination = pageNumber.HasValue && pageNumber.Value > 0 &&
-                                pageSize.HasValue && pageSize.Value > 0;
+            var totalCount = includeTotalCount
+                ? await query.CountAsync(cancellationToken)
+                : -1;
 
-            if (usePagination)
-            {
-                var skip = (pageNumber.Value - 1) * pageSize.Value;
-                query = query.Skip(skip).Take(pageSize.Value);
-            }
-            else
-            {
-                pageNumber = 1;
-                pageSize = totalCount == 0 ? 0 : totalCount;
-            }
+            var skip = (long)(pageNumber - 1) * pageSize;
 
-            // 3. Proyección a DTO + ejecución
             var items = await query
+                .Skip((int)Math.Min(skip, int.MaxValue))            // defensa extra
+                .Take(pageSize)
                 .Select(selector)
                 .ToListAsync(cancellationToken);
 
-            // 4. Construir resultado
             return new PagedResult<TDest>
             {
                 Items = items,
                 TotalCount = totalCount,
-                PageNumber = pageNumber ?? 1,
-                PageSize = pageSize ?? 0
+                PageNumber = pageNumber,
+                PageSize = pageSize
             };
         }
 
-        // OPCIONAL: overload si quieres paginar entidades sin proyectar
         public static Task<PagedResult<TSource>> ToPagedResultAsync<TSource>(
-            this IQueryable<TSource> query,
-            int? pageNumber,
-            int? pageSize,
+            this IOrderedQueryable<TSource> query,
+            int pageNumber,
+            int pageSize,
+            int maxPageSize = 200,
+            bool includeTotalCount = true,
             CancellationToken cancellationToken = default)
-        {
-            return query.ToPagedResultAsync<TSource, TSource>(
-                pageNumber,
-                pageSize,
-                x => x,
-                cancellationToken);
-        }
+            => query.ToPagedResultAsync(pageNumber, pageSize, x => x, maxPageSize, includeTotalCount, cancellationToken);
     }
+
 }

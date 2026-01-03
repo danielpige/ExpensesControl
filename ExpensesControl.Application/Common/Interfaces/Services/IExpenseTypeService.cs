@@ -10,8 +10,8 @@ namespace ExpensesControl.Application.Common.Interfaces.Services
 {
     public interface IExpenseTypeService
     {
-        Task<PagedResult<ExpenseTypeDto>> GetAllAsync(int? pageNumber = null, int? pageSize = null);
-        Task<PagedResult<ExpenseTypeDto>> GetAllByUserIdAsync(int userId, int? pageNumber = null, int? pageSize = null);
+        Task<PagedResult<ExpenseTypeDto>> GetAllAsync(int pageNumber = 1, int pageSize = 10);
+        Task<PagedResult<ExpenseTypeDto>> GetAllByUserIdAsync(int userId, int pageNumber = 1, int pageSize = 10);
         Task<ExpenseTypeDto?> GetByIdAsync(int id);
         Task<ExpenseTypeDto> CreateAsync(CreateExpenseTypeRequestDto dto, int userId);
         Task<ExpenseTypeDto?> UpdateAsync(int id, UpdateExpenseTypeRequestDto dto);

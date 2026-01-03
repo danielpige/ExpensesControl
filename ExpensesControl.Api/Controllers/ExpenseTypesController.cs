@@ -1,7 +1,8 @@
-﻿using ExpensesControl.Api.Common;
+﻿using ExpensesControl.Api.Attributes;
+using ExpensesControl.Api.Common;
+using ExpensesControl.Application.Common.Interfaces.Services;
 using ExpensesControl.Application.Common.Models.Pagination;
 using ExpensesControl.Application.Dtos.ExpenseType;
-using ExpensesControl.Application.Common.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -24,14 +25,14 @@ namespace ExpensesControl.Api.Controllers
             int.Parse(User.FindFirstValue("userId")!);
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
+        public async Task<IActionResult> GetAll([FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
             var data = await _expenseTypeService.GetAllAsync(pageNumber, pageSize);
             return Ok(ApiResponse<PagedResult<ExpenseTypeDto>>.Ok(data));
         }
 
         [HttpGet("get-all-by-current-user")]
-        public async Task<IActionResult> GetAllByCurrentUser([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
+        public async Task<IActionResult> GetAllByCurrentUser([FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
             var data = await _expenseTypeService.GetAllByUserIdAsync(GetUserId(), pageNumber, pageSize);
             return Ok(ApiResponse<PagedResult<ExpenseTypeDto>>.Ok(data));
@@ -47,6 +48,7 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<ExpenseTypeDto>.Ok(item));
         }
 
+        [RequireIdempotency]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateExpenseTypeRequestDto dto)
         {
@@ -62,6 +64,7 @@ namespace ExpensesControl.Api.Controllers
             }
         }
 
+        [RequireIdempotency]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateExpenseTypeRequestDto dto)
         {
@@ -72,6 +75,7 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<ExpenseTypeDto>.Ok(updated, "Expense type updated successfully."));
         }
 
+        [RequireIdempotency]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

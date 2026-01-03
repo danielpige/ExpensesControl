@@ -48,6 +48,7 @@ builder.Services.AddScoped<IMovementService, MovementService>();
 builder.Services.AddScoped<IExpenseTypeService, ExpenseTypeService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IMovementReportService, MovementReportService>();
+builder.Services.AddHostedService<IdempotencyCleanupService>();
 
 // Controllers + FluentValidation
 builder.Services
@@ -186,6 +187,8 @@ app.UseCors("AllowAngularClient");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<IdempotencyMiddleware>();
 
 app.MapControllers();
 

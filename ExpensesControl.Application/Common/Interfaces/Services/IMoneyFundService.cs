@@ -10,8 +10,8 @@ namespace ExpensesControl.Application.Common.Interfaces.Services
 {
     public interface IMoneyFundService
     {
-        Task<PagedResult<MoneyFundDto>> GetAllAsync(int? pageNumber = 0, int? pageSize = 0);
-        Task<PagedResult<MoneyFundDto>> GetAllByUserIdAsync(int userId, int? pageNumber = 0, int? pageSize = 0);
+        Task<PagedResult<MoneyFundDto>> GetAllAsync(int pageNumber = 1, int pageSize = 10);
+        Task<PagedResult<MoneyFundDto>> GetAllByUserIdAsync(int userId, int pageNumber = 1, int pageSize = 10);
         Task<MoneyFundDto?> GetByIdAsync(int id);
         Task<MoneyFundDto> CreateAsync(CreateMoneyFundRequestDto dto, int userId);
         Task<MoneyFundDto?> UpdateAsync(int id, UpdateMoneyFundRequestDto dto);

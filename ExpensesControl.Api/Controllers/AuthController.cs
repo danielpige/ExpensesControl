@@ -1,6 +1,7 @@
-﻿using ExpensesControl.Api.Common;
-using ExpensesControl.Application.Dtos.Auth;
+﻿using ExpensesControl.Api.Attributes;
+using ExpensesControl.Api.Common;
 using ExpensesControl.Application.Common.Interfaces.Services;
+using ExpensesControl.Application.Dtos.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpensesControl.Api.Controllers
@@ -16,6 +17,7 @@ namespace ExpensesControl.Api.Controllers
             _authService = authService;
         }
 
+        [RequireIdempotency]
         [HttpPost("register")]
         public async Task<ActionResult<ApiResponse<AuthResponseDto>>> Register([FromBody] RegisterRequestDto dto)
         {
@@ -23,6 +25,7 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<AuthResponseDto>.Ok(result, "User registered successfully."));
         }
 
+        [RequireIdempotency]
         [HttpPost("login")]
         public async Task<ActionResult<ApiResponse<AuthResponseDto>>> Login([FromBody] LoginRequestDto dto)
         {
