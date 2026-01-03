@@ -5,6 +5,7 @@ using ExpensesControl.Application.Common.Models.Pagination;
 using ExpensesControl.Application.Dtos.MoneyFund;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace ExpensesControl.Api.Controllers
@@ -48,16 +49,17 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<MoneyFundDto>.Ok(fund));
         }
 
-        [RequireIdempotency]
         [HttpPost]
+        [EnableRateLimiting("writes_user")]
+        [RequireIdempotency]
         public async Task<IActionResult> Create([FromBody] CreateMoneyFundRequestDto dto)
         {
             var created = await _moneyFundService.CreateAsync(dto, GetUserId());
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, ApiResponse<MoneyFundDto>.Ok(created));
         }
 
-        [RequireIdempotency]
         [HttpPut("{id:int}")]
+        [RequireIdempotency]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateMoneyFundRequestDto dto)
         {
             var updated = await _moneyFundService.UpdateAsync(id, dto);
@@ -67,8 +69,8 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<MoneyFundDto>.Ok(updated));
         }
 
-        [RequireIdempotency]
         [HttpDelete("{id:int}")]
+        [RequireIdempotency]
         public async Task<IActionResult> Delete(int id)
         {
             var deleted = await _moneyFundService.DeleteAsync(id);

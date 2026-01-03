@@ -3,6 +3,7 @@ using ExpensesControl.Api.Common;
 using ExpensesControl.Application.Common.Interfaces.Services;
 using ExpensesControl.Application.Dtos.Auth;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ExpensesControl.Api.Controllers
 {
@@ -17,16 +18,19 @@ namespace ExpensesControl.Api.Controllers
             _authService = authService;
         }
 
-        [RequireIdempotency]
         [HttpPost("register")]
+        [EnableRateLimiting("auth_strict")]
+        [RequireIdempotency]
         public async Task<ActionResult<ApiResponse<AuthResponseDto>>> Register([FromBody] RegisterRequestDto dto)
         {
             var result = await _authService.RegisterAsync(dto);
             return Ok(ApiResponse<AuthResponseDto>.Ok(result, "User registered successfully."));
         }
 
-        [RequireIdempotency]
+
         [HttpPost("login")]
+        [EnableRateLimiting("auth_strict")]
+        [RequireIdempotency]
         public async Task<ActionResult<ApiResponse<AuthResponseDto>>> Login([FromBody] LoginRequestDto dto)
         {
             var result = await _authService.LoginAsync(dto);
