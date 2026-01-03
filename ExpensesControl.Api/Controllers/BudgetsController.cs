@@ -5,6 +5,7 @@ using ExpensesControl.Application.Common.Models.Pagination;
 using ExpensesControl.Application.Dtos.Budget;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace ExpensesControl.Api.Controllers
@@ -31,8 +32,9 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<PagedResult<BudgetDto>>.Ok(data));
         }
 
-        [RequireIdempotency]
         [HttpPost]
+        [EnableRateLimiting("writes_user")]
+        [RequireIdempotency]
         public async Task<IActionResult> Create(CreateBudgetRequestDto dto)
         {
             try
@@ -46,8 +48,9 @@ namespace ExpensesControl.Api.Controllers
             }
         }
 
-        [RequireIdempotency]
+
         [HttpPut("{id:int}")]
+        [RequireIdempotency]
         public async Task<IActionResult> Update(int id, UpdateBudgetRequestDto dto)
         {
             var result = await _budgetService.UpdateAsync(id, GetUserId(), dto);
@@ -57,8 +60,9 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<BudgetDto>.Ok(result));
         }
 
-        [RequireIdempotency]
+
         [HttpDelete("{id:int}")]
+        [RequireIdempotency]
         public async Task<IActionResult> Delete(int id)
         {
             var deleted = await _budgetService.DeleteAsync(id, GetUserId());

@@ -5,6 +5,7 @@ using ExpensesControl.Application.Dtos.Deposit;
 using ExpensesControl.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace ExpensesControl.Api.Controllers
@@ -24,8 +25,9 @@ namespace ExpensesControl.Api.Controllers
         private int GetUserId() =>
             int.Parse(User.FindFirstValue("userId")!);
 
-        [RequireIdempotency]
         [HttpPost]
+        [EnableRateLimiting("writes_user")]
+        [RequireIdempotency]
         public async Task<IActionResult> Create([FromBody] CreateDepositRequestDto dto)
         {
             try

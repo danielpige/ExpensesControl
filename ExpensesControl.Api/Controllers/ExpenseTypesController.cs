@@ -5,6 +5,7 @@ using ExpensesControl.Application.Common.Models.Pagination;
 using ExpensesControl.Application.Dtos.ExpenseType;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace ExpensesControl.Api.Controllers
@@ -48,8 +49,9 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<ExpenseTypeDto>.Ok(item));
         }
 
-        [RequireIdempotency]
         [HttpPost]
+        [EnableRateLimiting("writes_user")]
+        [RequireIdempotency]
         public async Task<IActionResult> Create([FromBody] CreateExpenseTypeRequestDto dto)
         {
             try
@@ -64,8 +66,9 @@ namespace ExpensesControl.Api.Controllers
             }
         }
 
-        [RequireIdempotency]
+
         [HttpPut("{id:int}")]
+        [RequireIdempotency]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateExpenseTypeRequestDto dto)
         {
             var updated = await _expenseTypeService.UpdateAsync(id, dto);
@@ -75,8 +78,9 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<ExpenseTypeDto>.Ok(updated, "Expense type updated successfully."));
         }
 
-        [RequireIdempotency]
+
         [HttpDelete("{id:int}")]
+        [RequireIdempotency]
         public async Task<IActionResult> Delete(int id)
         {
             var deleted = await _expenseTypeService.DeleteAsync(id);
