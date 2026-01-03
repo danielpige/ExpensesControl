@@ -1,6 +1,8 @@
-﻿using ExpensesControl.Api.Common;
-using ExpensesControl.Application.Dtos.Budget;
+﻿using ExpensesControl.Api.Attributes;
+using ExpensesControl.Api.Common;
 using ExpensesControl.Application.Common.Interfaces.Services;
+using ExpensesControl.Application.Common.Models.Pagination;
+using ExpensesControl.Application.Dtos.Budget;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -23,12 +25,13 @@ namespace ExpensesControl.Api.Controllers
             int.Parse(User.FindFirstValue("userId")!);
 
         [HttpGet]
-        public async Task<IActionResult> GetByMonth(int year, int month)
+        public async Task<IActionResult> GetByMonth([FromQuery] int year, [FromQuery] int month, [FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
-            var data = await _budgetService.GetByMonthAsync(GetUserId(), year, month);
-            return Ok(ApiResponse<List<BudgetDto>>.Ok(data));
+            var data = await _budgetService.GetByMonthAsync(GetUserId(), year, month, pageNumber, pageSize);
+            return Ok(ApiResponse<PagedResult<BudgetDto>>.Ok(data));
         }
 
+        [RequireIdempotency]
         [HttpPost]
         public async Task<IActionResult> Create(CreateBudgetRequestDto dto)
         {
@@ -43,6 +46,7 @@ namespace ExpensesControl.Api.Controllers
             }
         }
 
+        [RequireIdempotency]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, UpdateBudgetRequestDto dto)
         {
@@ -53,6 +57,7 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<BudgetDto>.Ok(result));
         }
 
+        [RequireIdempotency]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

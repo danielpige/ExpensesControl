@@ -1,7 +1,8 @@
-﻿using ExpensesControl.Api.Common;
+﻿using ExpensesControl.Api.Attributes;
+using ExpensesControl.Api.Common;
+using ExpensesControl.Application.Common.Interfaces.Services;
 using ExpensesControl.Application.Common.Models.Pagination;
 using ExpensesControl.Application.Dtos.MoneyFund;
-using ExpensesControl.Application.Common.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -24,14 +25,14 @@ namespace ExpensesControl.Api.Controllers
             int.Parse(User.FindFirstValue("userId")!);
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
+        public async Task<IActionResult> GetAll([FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
             var data = await _moneyFundService.GetAllAsync(pageNumber, pageSize);
             return Ok(ApiResponse<PagedResult<MoneyFundDto>>.Ok(data));
         }
 
         [HttpGet("get-all-by-current-user")]
-        public async Task<IActionResult> GetAllByCurrentUser([FromQuery] int? pageNumber, [FromQuery] int? pageSize)
+        public async Task<IActionResult> GetAllByCurrentUser([FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
             var data = await _moneyFundService.GetAllByUserIdAsync(GetUserId(), pageNumber, pageSize);
             return Ok(ApiResponse<PagedResult<MoneyFundDto>>.Ok(data));
@@ -47,6 +48,7 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<MoneyFundDto>.Ok(fund));
         }
 
+        [RequireIdempotency]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateMoneyFundRequestDto dto)
         {
@@ -54,6 +56,7 @@ namespace ExpensesControl.Api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, ApiResponse<MoneyFundDto>.Ok(created));
         }
 
+        [RequireIdempotency]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateMoneyFundRequestDto dto)
         {
@@ -64,6 +67,7 @@ namespace ExpensesControl.Api.Controllers
             return Ok(ApiResponse<MoneyFundDto>.Ok(updated));
         }
 
+        [RequireIdempotency]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

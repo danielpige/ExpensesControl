@@ -1,7 +1,10 @@
-﻿using ExpensesControl.Application.Dtos.Budget;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using ExpensesControl.Application.Common.Interfaces.Services;
+using ExpensesControl.Application.Common.Models.Pagination;
+using ExpensesControl.Application.Dtos.Budget;
 using ExpensesControl.Domain.Entities;
 using ExpensesControl.Infrastructure.Persistence;
-using ExpensesControl.Application.Common.Interfaces.Services;
+using ExpensesControl.Infrastructure.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,24 +23,32 @@ namespace ExpensesControl.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<List<BudgetDto>> GetByMonthAsync(int userId, int year, int month)
+        public async Task<PagedResult<BudgetDto>> GetByMonthAsync(int userId, int year, int month, int pageNumber = 1, int pageSize = 10)
         {
-            return await _context.Budgets
+            var query = _context.Budgets
+                .AsNoTracking()
                 .Include(b => b.ExpenseType)
                 .Where(b =>
                     b.UserId == userId &&
                     b.Year == year &&
                     b.Month == month)
-                .Select(b => new BudgetDto
-                {
-                    Id = b.Id,
-                    ExpenseTypeId = b.ExpenseTypeId,
-                    ExpenseTypeName = b.ExpenseType.Name,
-                    Year = b.Year,
-                    Month = b.Month,
-                    Amount = b.Amount
-                })
-                .ToListAsync();
+                .OrderByDescending(x => x.CreatedAt)
+                .ThenByDescending(x => x.Id);
+
+            var result = await query.ToPagedResultAsync(
+            pageNumber,
+            pageSize,
+            b => new BudgetDto
+            {
+                Id = b.Id,
+                ExpenseTypeId = b.ExpenseTypeId,
+                ExpenseTypeName = b.ExpenseType.Name,
+                Year = b.Year,
+                Month = b.Month,
+                Amount = b.Amount
+            });
+
+            return result;
         }
 
         public async Task<BudgetDto> CreateAsync(int userId, CreateBudgetRequestDto dto)

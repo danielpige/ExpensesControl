@@ -22,12 +22,13 @@ namespace ExpensesControl.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<PagedResult<MoneyFundDto>> GetAllAsync(int? pageNumber = 0, int? pageSize = 0)
+        public async Task<PagedResult<MoneyFundDto>> GetAllAsync(int pageNumber = 1, int pageSize = 10)
         {
 
             var query = _context.MoneyFunds
                 .AsNoTracking()
-                .OrderBy(x => x.CreatedAt);
+                .OrderByDescending(x => x.CreatedAt)
+                .ThenByDescending(x => x.Id);
 
             var result = await query.ToPagedResultAsync(
             pageNumber,
@@ -45,13 +46,14 @@ namespace ExpensesControl.Infrastructure.Services
             return result;
         }
 
-        public async Task<PagedResult<MoneyFundDto>> GetAllByUserIdAsync(int userId, int? pageNumber = 0, int? pageSize = 0)
+        public async Task<PagedResult<MoneyFundDto>> GetAllByUserIdAsync(int userId, int pageNumber = 1, int pageSize = 10)
         {
 
             var query = _context.MoneyFunds
                 .AsNoTracking()
                 .Where(x => x.UserId == userId)
-                .OrderBy(x => x.CreatedAt);
+                .OrderByDescending(x => x.CreatedAt)
+                .ThenByDescending(x => x.Id);
 
             var result = await query.ToPagedResultAsync(
             pageNumber,
@@ -156,7 +158,7 @@ namespace ExpensesControl.Infrastructure.Services
         {
             return await _context.MoneyFunds
                 .Where(mf => mf.IsActive)
-                .OrderBy(mf => mf.CreatedAt)
+                .OrderByDescending(mf => mf.CreatedAt)
                 .Select(mf => new MoneyFundDto
                 {
                     Id = mf.Id,
@@ -173,7 +175,7 @@ namespace ExpensesControl.Infrastructure.Services
         {
             return await _context.MoneyFunds
                 .Where(mf => mf.IsActive && mf.UserId == userId)
-                .OrderBy(mf => mf.CreatedAt)
+                .OrderByDescending(mf => mf.CreatedAt)
                 .Select(mf => new MoneyFundDto
                 {
                     Id = mf.Id,

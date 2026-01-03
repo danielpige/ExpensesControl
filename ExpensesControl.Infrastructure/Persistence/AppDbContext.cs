@@ -22,6 +22,7 @@ namespace ExpensesControl.Infrastructure.Persistence
         public DbSet<ExpenseHeader> ExpenseHeaders => Set<ExpenseHeader>();
         public DbSet<ExpenseDetail> ExpenseDetails => Set<ExpenseDetail>();
         public DbSet<Deposit> Deposits => Set<Deposit>();
+        public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

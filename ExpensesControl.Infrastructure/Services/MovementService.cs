@@ -38,7 +38,7 @@ namespace ExpensesControl.Infrastructure.Services
                 .Select(e => new MovementDto
                 {
                     Date = e.Date,
-                    MovementType = "Expense",
+                    MovementType = "Gasto",
                     ReferenceId = e.Id,
                     MoneyFundId = e.MoneyFundId,
                     MoneyFundName = e.MoneyFund.Name,
@@ -64,12 +64,12 @@ namespace ExpensesControl.Infrastructure.Services
                 .Select(d => new MovementDto
                 {
                     Date = d.Date,
-                    MovementType = "Deposit",
+                    MovementType = "Deposito",
                     ReferenceId = d.Id,
                     MoneyFundId = d.MoneyFundId,
                     MoneyFundName = d.MoneyFund.Name,
                     Amount = d.Amount,                // ingreso
-                    Description = "Deposit"
+                    Description = "Deposito"
                 })
                 .ToListAsync();
 
